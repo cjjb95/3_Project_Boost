@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class Rocket : MonoBehaviour
 {
-
+        
+    [SerializeField]  float rcsThrust = 100f; //SerializedField makes the vairable available in the inspector but stops it from being edited in other scripts.
+    [SerializeField] float mainThrust = 100f;
     Rigidbody rigidBody;
     AudioSource audioSource;
     // Start is called before the first frame update
@@ -18,28 +20,43 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
     }
-
-    private void ProcessInput()
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidBody.AddRelativeForce(Vector3.up);
-            if(!audioSource.isPlaying) //prevents Audio Repeating
-            { 
+            rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+            if (audioSource.isPlaying == false) //prevents Audio Repeating
+            {
                 audioSource.Play();
             }
-            else{
-                audioSource.Stop();
-            }
         }
-        if (Input.GetKey(KeyCode.D))
+        else
         {
-            transform.Rotate(Vector3.forward);
+            audioSource.Stop();
         }
-        else if (Input.GetKey(KeyCode.A)){
-            transform.Rotate(-Vector3.forward);
-        }
+
     }
+
+    private void Rotate()
+    { 
+
+        rigidBody.freezeRotation = true ;
+
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+        if (Input.GetKey(KeyCode.A))
+        {
+
+            transform.Rotate(Vector3.forward * rotationThisFrame);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
+        }
+        rigidBody.freezeRotation = false;
+    }
+
+    
 }
