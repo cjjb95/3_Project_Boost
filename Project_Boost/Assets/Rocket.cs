@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Rocket : MonoBehaviour
 {
-        
-    [SerializeField]  float rcsThrust = 100f; //SerializedField makes the vairable available in the inspector but stops it from being edited in other scripts.
+
+    [SerializeField] float rcsThrust = 100f; //SerializedField makes the vairable available in the inspector but stops it from being edited in other scripts.
     [SerializeField] float mainThrust = 100f;
     Rigidbody rigidBody;
     AudioSource audioSource;
@@ -40,23 +40,39 @@ public class Rocket : MonoBehaviour
 
     }
 
-    private void Rotate()
-    { 
+    private void OnCollisionEnter(Collision collision)
+    {
+        switch (collision.gameObject.tag)
+        {
+            case "Friendly":
+                print("OK");
+                break;
+            case "Fuel":
+                print("Fueled");
+                break;
+            default:
+                print("Dead");
+                break;
+        }
+    }
 
-        rigidBody.freezeRotation = true ;
+    private void Rotate()
+    {
+
+        rigidBody.freezeRotation = true;
 
         float rotationThisFrame = rcsThrust * Time.deltaTime;
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.D))
         {
 
-            transform.Rotate(Vector3.forward * rotationThisFrame);
+            transform.Rotate(Vector3.right * rotationThisFrame);
         }
-        else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(-Vector3.forward * rotationThisFrame);
+            transform.Rotate(-Vector3.right * rotationThisFrame);
         }
         rigidBody.freezeRotation = false;
     }
 
-    
+
 }
