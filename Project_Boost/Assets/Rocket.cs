@@ -9,6 +9,9 @@ public class Rocket : MonoBehaviour
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip success;
     [SerializeField] AudioClip playerDeath;
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem playerDeathParticles;
 
     Rigidbody rigidBody;
     AudioSource audioSource;
@@ -39,6 +42,7 @@ public class Rocket : MonoBehaviour
         else
         {
             audioSource.Stop();
+            mainEngineParticles.Stop();
         }
 
     }
@@ -50,6 +54,7 @@ public class Rocket : MonoBehaviour
         {
             audioSource.PlayOneShot(mainEngine);
         }
+        mainEngineParticles.Play();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -76,15 +81,17 @@ public class Rocket : MonoBehaviour
         state = State.Dying;
         Invoke("LoadFirstScene", 1f); //Loads the first level after one second
         audioSource.Stop();
+        playerDeathParticles.Play();
         audioSource.PlayOneShot(playerDeath);
     }
 
     private void startSuccessSequence()
     {
         state = State.Transcending;
-        Invoke("LoadNextScene", 1f); //Loads next Level after 1 second
         audioSource.Stop();
         audioSource.PlayOneShot(success);
+        successParticles.Play();
+        Invoke("LoadNextScene", 1f); //Loads next Level after 1 second
     }
 
     private void LoadFirstScene()
