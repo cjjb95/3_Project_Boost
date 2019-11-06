@@ -6,6 +6,9 @@ public class Rocket : MonoBehaviour
 
     [SerializeField] float rcsThrust = 100f; //SerializedField makes the vairable available in the inspector but stops it from being edited in other scripts.
     [SerializeField] float mainThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip success;
+    [SerializeField] AudioClip playerDeath;
 
     Rigidbody rigidBody;
     AudioSource audioSource;
@@ -23,25 +26,30 @@ public class Rocket : MonoBehaviour
     {
         if (state == State.Alive)
         {
-            Thrust();
+            RespondToThrustInput();
             Rotate();
         }
     }
-    private void Thrust()
+    private void RespondToThrustInput()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidBody.AddRelativeForce(Vector3.up * mainThrust);
-            if (audioSource.isPlaying == false) //prevents Audio Repeating
-            {
-                audioSource.Play();
-            }
+            ApplyThrust();
         }
         else
         {
             audioSource.Stop();
         }
 
+    }
+
+    private void ApplyThrust()
+    {
+        rigidBody.AddRelativeForce(Vector3.up * mainThrust);
+        if (audioSource.isPlaying == false) //prevents Audio Repeating
+        {
+            audioSource.PlayOneShot(mainEngine);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -55,14 +63,28 @@ public class Rocket : MonoBehaviour
                 print("OK");
                 break;
             case "Finish":
-                state = State.Transcending;
-                Invoke("LoadNextScene",1f);
+                startSuccessSequence();
                 break;
             default:
-                state = State.Dying;
-                Invoke("LoadFirstScene", 1f);
+                startDeathSequence();
                 break;
         }
+    }
+
+    private void startDeathSequence()
+    {
+        state = State.Dying;
+        Invoke("LoadFirstScene", 1f); //Loads the first level after one second
+        audioSource.Stop();
+        audioSource.PlayOneShot(playerDeath);
+    }
+
+    private void startSuccessSequence()
+    {
+        state = State.Transcending;
+        Invoke("LoadNextScene", 1f); //Loads next Level after 1 second
+        audioSource.Stop();
+        audioSource.PlayOneShot(success);
     }
 
     private void LoadFirstScene()
@@ -73,6 +95,7 @@ public class Rocket : MonoBehaviour
     private void LoadNextScene()
     {
         SceneManager.LoadScene(1);
+
     }
 
     private void Rotate()
